@@ -180,6 +180,6 @@ GitHub CLI (`gh auth login`), and a configured Git author identity.
 
 An optional positional argument selects a different new repository name. The
 script refuses to reuse an existing remote repository. If creation succeeds but
-the push fails, the displayed local checkout under `dist/github-*/` can be used
+the push fails, the displayed local checkout under `dist/<repository-name>/` can be used
 to retry `git push -u origin main`. On success, the URL is printed and saved in
 `results/github_repository.json`.
