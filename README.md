@@ -1,185 +1,117 @@
-# RAG assignment: baseline vs. re-ranking
+# RAG Assignment: Baseline Retrieval vs. Re-ranking
 
-A reproducible experiment comparing dense Top 3 retrieval with cross-encoder
-re-ranking of the **same Top 10**, over the original 88-page GDPR PDF.
+The experiment compares two retrieval workflows over the original 88-page GDPR
+PDF. Both use the same chunked corpus and initial Top 10 candidates.
 
-**Start with [Baseline_vs_Reranking.ipynb](Baseline_vs_Reranking.ipynb).** It embeds
-the complete pipeline implementation, explanations, tables, and saved outputs.
-The PDF used as data is `data/gdpr.pdf`; `Assignment.pdf` is the specification,
-not retrieval data.
+- **Baseline:** dense cosine retrieval → first 3 chunks → Answer 1.
+- **Re-ranking:** score the same 10 candidates with a cross-encoder → best 3
+  chunks → Answer 2.
 
-The saved notebook contains a completed OpenRouter experiment using
-`deepseek/deepseek-v4.1-flash`: both answers for three distinct failure cases,
-their rank shifts, and repeated latency measurements. Check
-`results/run_status.json` and `results/validation.json` for execution status.
-The additional saved `results/context_boundary_case.json` preserves an observed
-limitation: a candidate ended mid-rule and its generated answer omitted an
-essential condition. Its evidence label was tightened to require the complete
-clause; it is excluded from the successful examples. The initial eight real API
-answers are retained across the six main answers and this two-answer case.
+Start with [Baseline_vs_Reranking.ipynb](Baseline_vs_Reranking.ipynb), which
+contains the full implementation, explanations, executed outputs, and figures.
+The report is available as [PDF](REPORT.pdf) and [Markdown](REPORT.md).
 
-## Run locally
+## Results
 
-Python 3.12 is recommended. The requirements install CPU PyTorch. A GPU is not
-required. First execution downloads the embedding and cross-encoder weights
-from Hugging Face. Answer generation can use OpenRouter or a local Hugging Face
-LLM; all retrieval and re-ranking run locally.
+| Case | Critical chunk | Baseline rank | Re-ranked rank |
+| --- | --- | ---: | ---: |
+| Public authority and legitimate interests | `p009-c01` | 8 | 1 |
+| Small organisation and processing records | `p051-c02` | 9 | 1 |
+| Scientific research and purpose limitation | `p035-c02` | 7 | 1 |
+
+Both answers were generated using `deepseek/deepseek-v4.1-flash` through
+OpenRouter. The model, prompt structure and generation settings are shared;
+only the supplied context changes. In these three examples, the baseline
+abstained because its context was insufficient, while re-ranking supplied the
+necessary evidence.
+
+The complete exploratory pool contains 54 query variants covering 18 clause
+targets. Six queries gained the necessary clause in the Top 3; thirteen missed
+it in the initial Top 10. These deliberately selected stress queries do not
+constitute an unbiased estimate of average retrieval accuracy.
+
+![Evidence rank changes and retrieval latency](results/comparison.png)
+
+Raw ranks, prompts, model responses and measured timings are included under
+`results/`. An additional context-boundary example records an incomplete rule
+and is excluded from the successful recovery cases.
+
+## Setup and execution
+
+Python 3.12 is recommended. The supplied requirements use CPU PyTorch; a GPU is
+not required. The first execution downloads the embedding and cross-encoder
+weights. The source PDF is bundled for reproducibility.
 
 ```bash
 uv venv --python 3.12 .venv
 uv pip install --python .venv/bin/python -r requirements.lock.txt
 cp .env.example .env
-# Edit .env: set OPENROUTER_API_KEY and optionally OPENROUTER_MODEL.
+```
+
+Set `OPENROUTER_API_KEY` in `.env`. The example selects the model used in the
+saved experiment. Register the environment as a notebook kernel:
+
+```bash
 .venv/bin/python -m ipykernel install --user --name rag-assignment \
   --display-name "RAG Assignment (Python 3.12)"
 ```
 
-Open the notebook in VS Code or Jupyter and select that kernel, then **Run All**.
-The notebook assumes its working directory is this repository's root. Jupyter's
-UI can be installed separately with `uv pip install --python .venv/bin/python jupyterlab`.
-You can also execute everything without a notebook UI:
+Open the notebook in VS Code or Jupyter, select that kernel, and run the cells
+in order from the repository root. JupyterLab can be installed separately:
 
 ```bash
-.venv/bin/python baseline_vs_reranking.py
+uv pip install --python .venv/bin/python jupyterlab
+.venv/bin/python -m jupyterlab
 ```
 
-To use the unpinned direct dependencies instead of the exact recorded environment,
-install `requirements.txt`. The lock file records the environment used for the
-committed experiment; CPU wheels are selected using PyTorch's official index.
-For CUDA, install a compatible PyTorch build separately, remove the CPU torch
-entry when installing other dependencies, and set `RAG_DEVICE=cuda`.
+`requirements.lock.txt` records the exact package versions used.
+`requirements.txt` lists the direct dependencies. Re-running the notebook
+writes new measurements to the evidence files. Matching LLM requests reuse a
+local response cache, avoiding additional generation requests.
 
-### Alternative answer backends
+To use the optional local answer model, set `RAG_LLM_BACKEND=local` in `.env`.
+This downloads `Qwen/Qwen2.5-1.5B-Instruct` and can be slow on CPU. Setting
+`RAG_LLM_BACKEND=none` produces retrieval-only outputs without LLM answers.
 
-```bash
-# Real local LLM: downloads Qwen/Qwen2.5-1.5B-Instruct (~3 GB), slower on CPU.
-RAG_LLM_BACKEND=local .venv/bin/python baseline_vs_reranking.py
+## Method and controls
 
-# Retrieval, ranking and latency only; not a complete assignment submission.
-RAG_LLM_BACKEND=none .venv/bin/python baseline_vs_reranking.py
-```
+- The corpus contains 391 page-local chunks with a 210-token window and
+  35-token overlap. Chunk IDs preserve their PDF page.
+- The bi-encoder is `sentence-transformers/all-MiniLM-L6-v2`. Normalized vectors
+  are stored in a NumPy matrix; exact dot-product search equals cosine search.
+- The cross-encoder is `cross-encoder/ms-marco-MiniLM-L6-v2`. It scores all ten
+  query–passage pairs and sorts them by relevance. It cannot add new candidates.
+- Retrieval model revisions, document hashes, seed and runtime environment are
+  recorded. Necessary-clause labels also include equivalent document wording.
+- Latency is measured after warm-up, ten times per selected query. Advanced
+  total includes query embedding, dense search, re-ranking and sorting. PDF
+  extraction, model loading, indexing and LLM generation are excluded.
+- Cross-encoder logits are relevance scores, not calibrated probabilities.
+  Citation consistency does not by itself establish factual correctness.
+- The document is the original 2016 text, retained as a fixed experimental
+  corpus. The experiment does not establish the content of current consolidated
+  law.
 
-OpenRouter model availability depends on the account/provider. The default is
-`deepseek/deepseek-v4.1-flash`; change `OPENROUTER_MODEL` if necessary. The supplied
-query pool selects three primary categories and needs six generation requests,
-plus retries on rate limits or server errors. Responses are cached by the complete request.
-Re-running an identical experiment reuses answers and makes no additional paid
-generation request. Change the payload or delete `results/answer_cache/` to
-regenerate. `.env`, caches, virtual environments and logs are excluded from Git.
+## Submission files
 
-## What is implemented
-
-| Assignment requirement | Implementation / evidence |
+| Path | Contents |
 | --- | --- |
-| One complex PDF | Official original GDPR, 88 pages, URL and SHA-256 in `data/provenance.json` |
-| Common chunked corpus | Page-local 210-token windows, 35-token overlap; `data/chunks.json` |
-| Dense bi-encoder vector store | Pinned all-MiniLM-L6-v2, normalized NumPy matrix, exact cosine search |
-| Baseline Top 10 → Top 3 → Answer 1 | Notebook sections 3 and 7 |
-| Same Top 10 → cross-encoder → Top 3 → Answer 2 | Pinned ms-marco-MiniLM-L6-v2, score every query/chunk pair |
-| Identical generation settings | One prompt builder and one generator; full messages saved |
-| At least two actual recoveries | Required at runtime; full Top 10 and source text exported |
-| Failure categories | Keyword/role distractors, exceptions, negation, and document-specific rules |
-| Rank shift evidence | `results/rank_shifts.csv`, `results/selected_cases.json` |
-| Compare generated answers | `results/answer_comparisons.json`, `results/answers.csv` |
-| Measured baseline vs. advanced latency | `results/latency_raw.csv`, `results/latency_summary.csv`, plot |
-| Reproducibility | Pinned retrieval model revisions, seed, hashes, package and hardware record |
-| Student-authored report | `REPORT_WORKSHEET.md` provides prompts; write the submission yourself |
+| `Baseline_vs_Reranking.ipynb` | Complete executable implementation and saved outputs |
+| `REPORT.pdf`, `REPORT.md` | Report with architecture, cases, timings, scaling discussion and plot |
+| `data/gdpr.pdf` | The single complex source document |
+| `data/queries.json` | Annotated stress queries and evidence clauses |
+| `data/provenance.json` | Source URL, hashes, model revisions and chunk configuration |
+| `results/` | Retrieval results, answers, rank shifts, raw timings, environment and plot |
+| `requirements*.txt`, `.env.example` | Environment and API configuration |
 
-## Experimental controls and limits
+The notebook contains its query annotations and regenerates extraction
+intermediates. Local development files, caches and credentials are excluded
+from Git.
 
-- One chunk list and one initial candidate list are shared. The reranker cannot
-  introduce new passages or recover evidence missing from the Top 10.
-- The query pool is **exploratory stress testing**, not a random test set. It has
-  54 query variants covering 18 clause targets; variants are correlated. Do not
-  present its aggregate scores as population-level accuracy.
-- Gold labels identify a necessary clause on a known PDF page. Every overlapping
-  chunk containing that clause counts. These are clause-coverage labels, not an
-  exhaustive relevance set. Read the exact source and both Top 3 contexts when
-  judging whether an answer could be supported by equivalent wording elsewhere.
-- All exploratory outcomes are saved, including ties, regressions and Top-10
-  misses. Only real rank 4–10 → Top 3 recoveries qualify for the selected examples.
-- Timings measure uncached online retrieval after warm-up. Advanced total means
-  **query encoding + cosine search + cross-encoder scoring + sorting**. LLM calls,
-  downloads, PDF extraction, model loading, and indexing are excluded and recorded
-  separately. GPU runs synchronize the device before measuring boundaries.
-- Both answers use identical model/prompt/settings; only contexts change.
-  Temperature zero does not guarantee provider-level determinism.
-- Citation checks detect out-of-context chunk IDs. They do not prove that an
-  answer is factually supported. Qualitative conclusions require human review.
-- The dataset is the original 2016 regulation, retained as a fixed experimental
-  document; this project makes no claim about current consolidated law.
+## References
 
-## Files and regeneration
-
-```text
-Baseline_vs_Reranking.ipynb   Primary, fully documented notebook with outputs
-baseline_vs_reranking.py     Same code in readable percent-cell source format
-data/gdpr.pdf                Fixed complex source PDF
-data/queries.json            Query pool and independent necessary-clause labels
-data/pages.json              Cleaned PDF text with one-based PDF page numbers
-data/chunks.json             All chunks and source offsets
-data/provenance.json         Source URL, hashes, token sizes and model revisions
-results/                    Saved experiment evidence and generation responses
-REPORT.md / REPORT.pdf      Complete report text and printable PDF for your review
-REPORT_WORKSHEET.md          Prompts for writing your own final report
-scripts/build_notebook.py    Rebuild notebook from percent-cell source
-scripts/create_queries.py    Recreate the original annotated query pool
-scripts/execute_notebook.py  Execute and save notebook outputs
-requirements.lock.txt       Exact package versions used
-```
-
-After editing the Python source, regenerate and execute the notebook:
-
-```bash
-.venv/bin/python scripts/build_notebook.py
-.venv/bin/python scripts/execute_notebook.py
-.venv/bin/python scripts/validate_results.py --require-answers
-```
-
-In environments that prohibit even local kernel sockets, use
-`scripts/execute_notebook.py --in-process`. It executes the same cells in a real
-IPython shell and captures their actual tables, figures and text; it does not
-simulate notebook outputs. External network access is still required for API
-answer generation and initial model downloads.
-
-Executing the notebook overwrites result files with the new measurements. The
-provided PDF is bundled for stable reproduction; if absent, it is downloaded
-from the official source. Changes to PDF bytes or chunk configuration invalidate
-the embedding cache automatically. Gold labels are validated against extracted
-text before evaluation.
-
-## Sources
-
-- [Assignment specification](Assignment.pdf)
 - [Official original GDPR PDF, EUR-Lex](https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:32016R0679)
 - [Sentence Transformers: retrieve and re-rank](https://www.sbert.net/examples/sentence_transformer/applications/retrieve_rerank/README.html)
-- [Sentence Transformers: cross-encoders](https://www.sbert.net/examples/cross_encoder/applications/README.html)
 - [Bi-encoder model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [Cross-encoder model card](https://huggingface.co/cross-encoder/ms-marco-MiniLM-L6-v2)
 - [OpenRouter chat completion API](https://openrouter.ai/docs/api/api-reference/chat/send-chat-completion-request)
-
-## Before submission
-
-Read the notebook and the exact evidence contexts. Complete your report in your
-own words using `REPORT_WORKSHEET.md`. Confirm that both generated answers are
-present for at least two selected recoveries. Submit the repository link plus
-your own concise report, as requested in the assignment.
-
-### Publish the code to GitHub
-
-The publishing helper creates a **new public repository** named
-`rag-baseline-vs-reranking-gdpr` in your authenticated account. It validates the
-experiment and scans the explicit bundle for your API key before copying it to
-a separate Git checkout under `dist/` and uploading it. `.env`, caches, weights
-and the virtual environment are excluded. It requires Git, an authenticated
-GitHub CLI (`gh auth login`), and a configured Git author identity.
-
-```bash
-.venv/bin/python scripts/publish_github.py
-```
-
-An optional positional argument selects a different new repository name. The
-script refuses to reuse an existing remote repository. If creation succeeds but
-the push fails, the displayed local checkout under `dist/<repository-name>/` can be used
-to retry `git push -u origin main`. On success, the URL is printed and saved in
-`results/github_repository.json`.
