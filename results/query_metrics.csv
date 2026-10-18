@@ -1,0 +1,55 @@
+id,category,query,article,page,baseline_evidence_rank,reranked_evidence_rank,baseline_hit_at_3,reranked_hit_at_3,status,baseline_reciprocal_rank_at_10,reranked_reciprocal_rank_at_10
+q01-1,negation_constraints,Can a public authority rely on legitimate interests when processing personal data in the performance of its tasks?,"Article 6(1), final subparagraph",36,2.0,1.0,True,True,both_top3,0.5,1.0
+q01-2,negation_constraints,A municipal authority wants to use legitimate interests rather than a statutory basis for its official duties. Is that basis available?,"Article 6(1), final subparagraph",36,8.0,1.0,False,True,restored,0.125,1.0
+q01-3,negation_constraints,Is legitimate interest a lawful basis for government bodies carrying out their public tasks?,"Article 6(1), final subparagraph",36,2.0,1.0,True,True,both_top3,0.5,1.0
+q02-1,exceptions_corner_cases,Does an organisation with fewer than 250 employees always avoid keeping records of processing activities? What if processing is not occasional?,Article 30(5),51,9.0,1.0,False,True,restored,0.1111111111111111,1.0
+q02-2,exceptions_corner_cases,Our company has 100 staff and processes personal information every day. Does the small-company record-keeping exemption apply?,Article 30(5),51,,,False,False,top10_miss,0.0,0.0
+q02-3,exceptions_corner_cases,Are small employers automatically exempt from processing records when their processing is routine rather than occasional?,Article 30(5),51,,,False,False,top10_miss,0.0,0.0
+q03-1,exceptions_corner_cases,Must affected individuals always be told about a high-risk breach if the stolen data was made unintelligible to unauthorised people by encryption?,Article 34(3)(a),53,1.0,1.0,True,True,both_top3,1.0,1.0
+q03-2,exceptions_corner_cases,When is individual breach communication not required because the compromised data cannot be read by unauthorised persons?,Article 34(3)(a),53,1.0,1.0,True,True,both_top3,1.0,1.0
+q03-3,exceptions_corner_cases,"If a laptop containing encrypted customer data is stolen, what protection-measures exception may remove the need to tell each customer?",Article 34(3)(a),53,1.0,1.0,True,True,both_top3,1.0,1.0
+q04-1,exceptions_corner_cases,"If informing every affected individual about a data breach would involve disproportionate effort, may the controller simply do nothing?",Article 34(3)(c),53,10.0,1.0,False,True,restored,0.1,1.0
+q04-2,exceptions_corner_cases,What substitute communication must a controller make when telling people individually about a breach is disproportionately difficult?,Article 34(3)(c),53,,,False,False,top10_miss,0.0,0.0
+q04-3,exceptions_corner_cases,"Is a public announcement permitted instead of contacting each victim of a breach, and on what condition?",Article 34(3)(c),53,,,False,False,top10_miss,0.0,0.0
+q05-1,exceptions_corner_cases,Must a controller finish every subject rights request within one month even if there are many complex requests?,Article 12(3),40,1.0,1.0,True,True,both_top3,1.0,1.0
+q05-2,exceptions_corner_cases,A business needs extra time to respond to a large number of complicated access requests. How long can it extend the deadline?,Article 12(3),40,2.0,2.0,True,True,both_top3,0.5,0.5
+q05-3,exceptions_corner_cases,"When may the one-month deadline for responding to an individual's rights request be extended, and by how much?",Article 12(3),40,1.0,1.0,True,True,both_top3,1.0,1.0
+q06-1,keyword_trap_distractor,"When a controller refuses a repetitive or excessive data access request, who has to prove that the request is excessive?",Article 12(5),40,1.0,1.0,True,True,both_top3,1.0,1.0
+q06-2,keyword_trap_distractor,Who must demonstrate that a subject access request is manifestly unfounded when a company charges a fee?,Article 12(5),40,1.0,2.0,True,True,both_top3,1.0,0.5
+q06-3,keyword_trap_distractor,Can a company require a requester to prove their repeated access request is reasonable before charging an administrative fee?,Article 12(5),40,1.0,1.0,True,True,both_top3,1.0,1.0
+q07-1,keyword_trap_distractor,Who bears the burden of proof when a supervisory authority charges a fee for a repetitive request?,Article 57(4),69,1.0,1.0,True,True,both_top3,1.0,1.0
+q07-2,keyword_trap_distractor,A privacy regulator refuses to act on an excessive request. Does the regulator or the requester need to prove excessiveness?,Article 57(4),69,,,False,False,top10_miss,0.0,0.0
+q07-3,keyword_trap_distractor,"When requests to the supervisory authority are manifestly unfounded, which party has to substantiate that assessment?",Article 57(4),69,,,False,False,top10_miss,0.0,0.0
+q08-1,negation_constraints,Can a controller keep using personal data for direct marketing after an objection by citing compelling legitimate grounds?,Article 21(3),45,,,False,False,top10_miss,0.0,0.0
+q08-2,negation_constraints,"After I object to direct marketing, can a company override my objection because its commercial interests are stronger?",Article 21(3),45,6.0,4.0,False,False,both_miss_top3,0.16666666666666666,0.25
+q08-3,negation_constraints,Does the compelling legitimate grounds exception let an organisation continue advertising to someone who has objected?,Article 21(3),45,,,False,False,top10_miss,0.0,0.0
+q09-1,negation_constraints,Does withdrawing consent make all processing that previously relied on that consent unlawful retroactively?,Article 7(3),37,1.0,1.0,True,True,both_top3,1.0,1.0
+q09-2,negation_constraints,"If a person revokes permission today, was the company's earlier consent-based data use illegal?",Article 7(3),37,1.0,2.0,True,True,both_top3,1.0,0.5
+q09-3,negation_constraints,What happens to the lawfulness of past data processing when consent is later withdrawn?,Article 7(3),37,1.0,1.0,True,True,both_top3,1.0,1.0
+q10-1,exceptions_corner_cases,"Is sixteen always the minimum age at which a child may consent to an information society service, or may a Member State lower it?","Article 8(1), second subparagraph",37,1.0,1.0,True,True,both_top3,1.0,1.0
+q10-2,exceptions_corner_cases,What is the lowest age a Member State can choose for a child's own consent to an online service?,"Article 8(1), second subparagraph",37,1.0,1.0,True,True,both_top3,1.0,1.0
+q10-3,exceptions_corner_cases,Can national law allow a thirteen-year-old to consent to an information society service without parental authorisation?,"Article 8(1), second subparagraph",37,1.0,1.0,True,True,both_top3,1.0,1.0
+q11-1,negation_constraints,Does the data portability right apply to processing necessary for a task in the public interest or official authority?,Article 20(3),45,,,False,False,top10_miss,0.0,0.0
+q11-2,negation_constraints,Can I demand portable data from a public body processing it to perform its statutory public task?,Article 20(3),45,5.0,2.0,False,True,restored,0.2,0.5
+q11-3,negation_constraints,Is processing for an official public-interest task covered by the right to receive and transfer my personal data?,Article 20(3),45,3.0,1.0,True,True,both_top3,0.3333333333333333,1.0
+q12-1,document_specific,Must courts always appoint a data protection officer when acting in their judicial capacity?,Article 37(1)(a),55,1.0,1.0,True,True,both_top3,1.0,1.0
+q12-2,document_specific,Which public authority is excepted from the mandatory data protection officer rule when it performs judicial functions?,Article 37(1)(a),55,1.0,1.0,True,True,both_top3,1.0,1.0
+q12-3,document_specific,Does the rule requiring public bodies to designate a DPO also cover a court's judicial work?,Article 37(1)(a),55,,,False,False,top10_miss,0.0,0.0
+q13-1,negation_constraints,Can a supervisory authority supervise the personal-data processing of a court acting in its judicial capacity?,Article 55(3),67,1.0,1.0,True,True,both_top3,1.0,1.0
+q13-2,negation_constraints,Who is outside a data protection supervisory authority's competence when acting in a judicial role?,Article 55(3),67,1.0,1.0,True,True,both_top3,1.0,1.0
+q13-3,negation_constraints,Does a national privacy regulator have jurisdiction over a court's processing during judicial proceedings?,Article 55(3),67,1.0,2.0,True,True,both_top3,1.0,0.5
+q14-1,exceptions_corner_cases,"Must every personal data breach be notified to the supervisory authority, even one unlikely to risk individuals' rights and freedoms?",Article 33(1),52,2.0,1.0,True,True,both_top3,0.5,1.0
+q14-2,exceptions_corner_cases,What risk-based exception allows a controller not to notify the regulator of a personal data breach?,Article 33(1),52,1.0,1.0,True,True,both_top3,1.0,1.0
+q14-3,exceptions_corner_cases,"If a breach is unlikely to harm people's rights, is notification to the authority still mandatory within 72 hours?",Article 33(1),52,1.0,1.0,True,True,both_top3,1.0,1.0
+q15-1,keyword_trap_distractor,Does a processor have the same 72-hour deadline as a controller for telling the controller about a personal data breach?,Article 33(2),52,1.0,1.0,True,True,both_top3,1.0,1.0
+q15-2,keyword_trap_distractor,"When a processor discovers a breach, whom must it inform and what deadline applies to that processor?",Article 33(2),52,1.0,1.0,True,True,both_top3,1.0,1.0
+q15-3,keyword_trap_distractor,May a data processor wait seventy-two hours before reporting a breach to its controller?,Article 33(2),52,1.0,2.0,True,True,both_top3,1.0,0.5
+q16-1,document_specific,Is later use for scientific research automatically incompatible with the original purpose of collecting the personal data?,Article 5(1)(b),35,7.0,1.0,False,True,restored,0.14285714285714285,1.0
+q16-2,document_specific,Does using previously collected data for public-interest archiving necessarily breach purpose limitation?,Article 5(1)(b),35,,,False,False,top10_miss,0.0,0.0
+q16-3,document_specific,How does the purpose limitation rule treat further processing for historical research or statistics?,Article 5(1)(b),35,4.0,2.0,False,True,restored,0.25,0.5
+q17-1,exceptions_corner_cases,Who is permitted to control a comprehensive register of criminal convictions?,Article 10,39,1.0,1.0,True,True,both_top3,1.0,1.0
+q17-2,exceptions_corner_cases,Can a private company keep a comprehensive criminal-convictions register under its own exclusive control?,Article 10,39,1.0,1.0,True,True,both_top3,1.0,1.0
+q17-3,exceptions_corner_cases,Is consent sufficient for a company to independently control a comprehensive register of criminal convictions?,Article 10,39,1.0,1.0,True,True,both_top3,1.0,1.0
+q18-1,negation_constraints,Does Article 41 monitoring of approved codes of conduct apply to processing by public authorities and bodies?,Article 41(6),58,,,False,False,top10_miss,0.0,0.0
+q18-2,negation_constraints,Are public bodies' processing activities covered by the accredited code-of-conduct monitoring-body provisions?,Article 41(6),58,3.0,3.0,True,True,both_top3,0.3333333333333333,0.3333333333333333
+q18-3,negation_constraints,Can the code-of-conduct monitoring mechanism under Article 41 be applied to a public authority's processing?,Article 41(6),58,,,False,False,top10_miss,0.0,0.0

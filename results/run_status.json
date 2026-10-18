@@ -1,0 +1,9 @@
+{
+  "retrieval_experiment_complete": true,
+  "answer_generation_complete": true,
+  "experiment_complete": true,
+  "selected_recoveries": 3,
+  "generation_backend": "openrouter",
+  "report_requires_student_writing": true,
+  "github_upload_requires_repository_access": true
+}
