@@ -7,6 +7,8 @@
 **Experiment date:** 18 October 2026  
 **Answer model:** `deepseek/deepseek-v4.1-flash` through OpenRouter
 
+**GitHub repository:** [https://github.com/prabhash1889/LMA-Assignment-2025201089](https://github.com/prabhash1889/LMA-Assignment-2025201089)
+
 ## 1. Architecture comparison
 
 Both pipelines use the same 391 chunks, created with a 210-token window and a 35-token overlap. The baseline embeds each chunk with `all-MiniLM-L6-v2` and stores the normalized vectors in a NumPy matrix. It embeds the query separately, retrieves the Top 10 by cosine similarity, and sends the first three chunks to the answer model.
